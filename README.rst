@@ -18,7 +18,7 @@ defaults which includes all default settings and config which has the current
 configuration. Those are then merged to create a single ConfigData instance
 with the complete configuration.
 
-.. code-block::
+::
 
    boost::shared_ptr<ConfigData> ReadConfig(const char *fn) {
        MemoryFile input(fn);
