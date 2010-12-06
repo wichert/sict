@@ -1,0 +1,55 @@
+CGI {
+	logdir		"/tmp";
+	templates	"/vhost/portal.ams.attingo.nl/http/template";
+	domain		".ams.attingo.nl";
+	cookietimeout	86400;
+};
+
+
+WISPr {
+	templates	"/vhost/portal.ams.attingo.nl/http/template/wispr";
+	location	"isocc=nl,cc=31,ac=20,network=ATTINGO";
+	name		"Attingo,Amsterdam Airport Schiphol";
+};
+
+
+SQL {
+	driver		"postgres";
+	server		"vortex";
+
+	radius {
+		database	"radius";
+	};
+
+	APE {
+		database	"ape";
+		countrytable	"countries";
+		websessiontable	"websessions";
+	};
+
+	CGI {
+		index		"sessionindex";
+		data		"sessiondata";
+	};
+};
+
+
+RADIUS {
+	dicts {
+		"/vhost/portal.ams.attingo.nl/etc/radius/dictionary";
+		"/vhost/portal.ams.attingo.nl/etc/radius/dictionary.attingo";
+		"/vhost/portal.ams.attingo.nl/etc/radius/dictionary.nomadix";
+	};
+
+	server {
+		hostname	"localhost";
+		secret		"secret1";
+	};
+
+	fuse {
+		hostname	"81.201.101.3";
+		port		1812;
+		secret		"secret2";
+	};
+};
+

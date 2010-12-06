@@ -14,7 +14,7 @@
 #include "file.hh"
 
 
-/** * Base class for parsing-related errors.
+/** Base class for parsing-related errors.
  */
 class error {
 };

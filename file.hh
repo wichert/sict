@@ -14,6 +14,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <boost/noncopyable.hpp>
 
 /** System exception.
  * exception class for standard operating system errors, normally reported
@@ -44,7 +45,7 @@ public:
 /** Simple file wrapper.
  * Use this class to open existing files for reading, writing or both.
  */
-class File {
+class File : public boost::noncopyable {
 public:	
 	/** File acess types.
 	 */
@@ -59,14 +60,26 @@ public:
 	 * \param name pathname of file to open
 	 * \param flags file access type
 	 */
-	File(const char *name, flags_type flags = ReadOnly);
+	File(const char *name, flags_type flags = ReadOnly) : hasstat(false), fileno(-1) {
+		open(name, flags);
+	}
+
 	virtual ~File();
+
+	/** Open a file.
+	 * Opens an already existing file. It is not allowed to open a new
+	 * file while an already opened.
+	 * \param name pathname of file to open
+	 * \param flags file access type
+	 */
+	virtual void open(const char *name, flags_type flags = ReadOnly);
+
 
 	/** Close a file.
 	 * Closes an open file. If closing fails a system_error
 	 * exception will be thrown.
 	 */
-	void close();
+	virtual void close();
 
 	/** Check if a file instance is closed.
 	 */
@@ -96,14 +109,32 @@ protected:
  * memory. This is done internally by using mmap. No file descriptor
  * is kept open.
  */
-class MemoryFile {
+class MemoryFile : public boost::noncopyable {
 public:
 	/** Default constructor.
 	 * \param name path of file to read
 	 * \param flags desired access type
 	 */
-	MemoryFile(const char *name, File::flags_type flags=File::ReadOnly);
+	MemoryFile(const char *name, File::flags_type flags=File::ReadOnly) : data(0), size(0) {
+		open(name, flags);
+	}
+
+
 	virtual ~MemoryFile();
+
+	/** Open a file.
+	 * Opens an already existing file. It is not allowed to open a new
+	 * file while an already opened.
+	 * \param name pathname of file to open
+	 * \param flags file access type
+	 */
+	void open(const char *name, File::flags_type flags=File::ReadOnly);
+
+	/** Close a file.
+	 * Closes an open file. If closing fails a system_error
+	 * exception will be thrown.
+	 */
+	virtual void close();
 
 	char *data;	/*!< pointer to file contents */
 	off_t size;	/*!< file size */

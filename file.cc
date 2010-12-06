@@ -9,8 +9,11 @@
 #include "file.hh"
 
 
-File::File(const char *name, File::flags_type flags) : hasstat(false) {
-	if ((fileno=open(name, flags))==-1)
+void File::open(const char *name, File::flags_type flags) {
+	if (fileno!=-1)
+		throw std::logic_error("opening an already open File");
+
+	if ((fileno=::open(name, flags))==-1)
 		throw system_exception(name);
 
 	name=name;
@@ -25,21 +28,31 @@ void File::AssertStat() {
 	}
 }
 
+
 void File::close() {
+	if (fileno==-1)
+		throw std::logic_error("Closing an already closed File");
+
 	if (::close(fileno)==-1)
 		throw system_exception(name);
+
 	fileno=-1;
+	hasstat=false;
+	name.clear();
 }
 
 
 
 File::~File() {
-	close();
+	if (fileno!=-1)
+		close();
 }
 
 
+void MemoryFile::open(const char *name, File::flags_type flags) {
+	if (data)
+		throw std::logic_error("opening an already open MemoryFile");
 
-MemoryFile::MemoryFile(const char *name, File::flags_type flags) {
 	File fd(name, flags);
 	int mapflags = 0;
 
@@ -59,13 +72,21 @@ MemoryFile::MemoryFile(const char *name, File::flags_type flags) {
 
 	if (data==MAP_FAILED)
 		throw system_exception();
-
 }
 
 
 MemoryFile::~MemoryFile() {
+	if (data)
+		close();
+
+}
+
+
+void MemoryFile::close() {
+	if (!data)
+		throw std::logic_error("Closing an already closed MemoryFile");
+
 	if (munmap(data, size)==-1)
 		throw system_exception();
-
 }
 

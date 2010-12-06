@@ -10,18 +10,29 @@
 #include "iscparser.hh"
 #include "file.hh"
 
+boost::shared_ptr<ConfigData> ReadConfig(const char *fn) {
+	MemoryFile input(fn);
+	Tokenizer toker(input);
+	ISCParser parser;
+
+	toker(dynamic_cast<TokenHandler&>(parser));
+	return parser.cfg;
+}
+
+
 int main(int argc, char **argv) {
 	if (argc!=2) {
 		std::cerr << "Wrong number of arguments" << std::endl;
 		return 1;
 	}
 
-	MemoryFile input(argv[1]);
-	Tokenizer toker(input);
-	ISCParser parser;
+	boost::shared_ptr<ConfigData> defaults;
+	boost::shared_ptr<ConfigData> settings;
 
 	try {
-		toker(dynamic_cast<TokenHandler&>(parser));
+		defaults=ReadConfig("defaults");
+		settings=ReadConfig("config");
+		settings->Merge(*defaults, false, true);
 	} catch (EofError) {
 		std::cerr << "Unexepcted end of file" << std::endl;
 		return 1;
@@ -33,8 +44,8 @@ int main(int argc, char **argv) {
 		return 2;
 	}
 
-	std::cout << "CGI logdir: " << (std::string&)(*parser.cfg)["CGI"]["logdir"] << std::endl;
-	std::cout << "RADIUS port: " << (int)(*parser.cfg)["RADIUS"]["server"]["port"] << std::endl;
+	std::cout << "CGI logdir: " << (const std::string&)(*settings)["CGI"]["logdir"] << std::endl;
+	std::cout << "RADIUS port: " << (int)(*settings)["RADIUS"]["server"]["port"] << std::endl;
 	
 	return 0;
 }
