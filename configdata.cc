@@ -63,21 +63,11 @@ void ConfigData::Merge(const ConfigData &other, bool overwrite, bool typecheck) 
 
 
 void ConfigData::Clear() {
-	if (type==Map) {
-		map_type::iterator i;
-
-		for (i=mapValue.begin(); i!=mapValue.end(); i++)
-			delete i->second;
-
+	if (type==Map) 
 		mapValue.clear();
-	} else if (type==List) {
-		list_type::iterator i;
-
-		for (i=listValue.begin(); i!=listValue.end(); i++)
-			delete *i;
-
+	else if (type==List)
 		listValue.clear();
-	} else if (type==String)
+	else if (type==String)
 		strValue.clear();
 
 	type=Bogus;

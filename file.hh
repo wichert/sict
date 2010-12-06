@@ -60,7 +60,7 @@ public:
 	 * \param name pathname of file to open
 	 * \param flags file access type
 	 */
-	File(const char *name, flags_type flags = ReadOnly) : hasstat(false), fileno(-1) {
+	File(const char *name, flags_type flags = ReadOnly) : fileno(-1), hasstat(false) {
 		open(name, flags);
 	}
 

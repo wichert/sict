@@ -1,8 +1,12 @@
 CXX		= g++
-CXXFLAGS	= -g
+CXXFLAGS	= -g -W -Wall -Wwrite-strings -Wpointer-arith -Wimplicit \
+		  -Wcast-qual -Winline -Wmissing-noreturn -Wsign-compare
 LDFLAGS		= -g
 
 all: main
+
+clean:
+	rm -f *.o main core
 
 main: main.o file.o tokenize.o iscparser.o configdata.o
 	$(CXX) $(LDFLAGS) -o $@ $^ -lstdc++

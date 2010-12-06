@@ -21,7 +21,7 @@ class error {
 
 
 /** End of file exception.
- * This exception is thrown if an end od file os encountered while
+ * This exception is thrown if an end of file is encountered while
  * processing a file.
  */
 class EofError : public error {
@@ -117,7 +117,7 @@ class ParsedTokenHandler : public TokenHandler {
 		if ((result==LONG_MIN || result==LONG_MAX) && errno==ERANGE)
 			throw new error();
 
-		if (end-data>length)
+		if (static_cast<unsigned int>(end-data)>length)
 			throw new error(); // internal error really
 
 		HandleInteger(result);
